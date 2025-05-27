@@ -1,0 +1,282 @@
+"use client"
+import { useState, useEffect } from "react"
+import { motion, AnimatePresence } from "framer-motion"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { ScrollArea } from "@/components/ui/scroll-area"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { Send, Bot, User, Sparkles, Loader2, Save, Download } from "lucide-react"
+import { Navigation } from "@/components/navigation"
+import { useChat } from "ai/react"
+import { ChatWelcome } from "@/components/chat-welcome"
+import { ChatHistorySidebar } from "@/components/chat-history-sidebar"
+import { useSession } from "@/hooks/use-session"
+import { useChatHistory } from "@/hooks/use-chat-history"
+import { toast } from "sonner"
+
+interface Conversation {
+  id: string
+  title: string
+  messages: any[]
+  created_at: string
+  updated_at: string
+}
+
+export default function ChatPage() {
+  const { sessionId, createNewSession } = useSession()
+  const { saveConversation, isSaving } = useChatHistory(sessionId)
+  const [sidebarOpen, setSidebarOpen] = useState(true) // Default to open on desktop
+  const [currentConversationId, setCurrentConversationId] = useState<string | null>(null)
+  const [isMobile, setIsMobile] = useState(false)
+
+  // Check if mobile on mount
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768)
+      if (window.innerWidth < 768) {
+        setSidebarOpen(false) // Close sidebar on mobile by default
+      }
+    }
+
+    checkMobile()
+    window.addEventListener("resize", checkMobile)
+    return () => window.removeEventListener("resize", checkMobile)
+  }, [])
+
+  const { messages, input, handleInputChange, handleSubmit, isLoading, setMessages } = useChat({
+    api: "/api/chat",
+    initialMessages: [
+      {
+        id: "welcome",
+        role: "assistant",
+        content:
+          "Hi! I'm your AI Career Advisor. I can help you with career guidance, job search tips, skill development advice, and answer any questions about your professional journey. How can I assist you today?",
+      },
+    ],
+  })
+
+  const handleSuggestedQuestion = (question: string) => {
+    handleInputChange({ target: { value: question } } as any)
+  }
+
+  const handleSaveConversation = async () => {
+    if (messages.length <= 1) {
+      toast.error("No conversation to save")
+      return
+    }
+
+    try {
+      const conversation = await saveConversation(messages)
+      setCurrentConversationId(conversation.id)
+      toast.success("Conversation saved successfully!")
+    } catch (error) {
+      toast.error("Failed to save conversation")
+    }
+  }
+
+  const handleLoadConversation = (conversation: Conversation) => {
+    setMessages(conversation.messages)
+    setCurrentConversationId(conversation.id)
+    if (isMobile) setSidebarOpen(false)
+    toast.success(`Loaded: ${conversation.title}`)
+  }
+
+  const handleNewChat = () => {
+    setMessages([
+      {
+        id: "welcome",
+        role: "assistant",
+        content:
+          "Hi! I'm your AI Career Advisor. I can help you with career guidance, job search tips, skill development advice, and answer any questions about your professional journey. How can I assist you today?",
+      },
+    ])
+    setCurrentConversationId(null)
+    if (isMobile) setSidebarOpen(false)
+    createNewSession()
+  }
+
+  const exportConversation = () => {
+    const conversationText = messages.map((msg) => `${msg.role === "user" ? "You" : "AI"}: ${msg.content}`).join("\n\n")
+
+    const blob = new Blob([conversationText], { type: "text/plain" })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement("a")
+    a.href = url
+    a.download = `career-chat-${new Date().toISOString().split("T")[0]}.txt`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+    toast.success("Conversation exported!")
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-purple-900">
+      <Navigation />
+
+      <ChatHistorySidebar
+        isOpen={sidebarOpen}
+        onToggle={() => setSidebarOpen(!sidebarOpen)}
+        onLoadConversation={handleLoadConversation}
+        onNewChat={handleNewChat}
+        sessionId={sessionId}
+      />
+
+      <div className={`pt-20 pb-4 transition-all duration-300 ${sidebarOpen && !isMobile ? "md:ml-80" : ""}`}>
+        <div className="container mx-auto px-4 h-[calc(100vh-6rem)]">
+          <div className="max-w-4xl mx-auto h-full flex flex-col">
+            {/* Header */}
+            <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-6">
+              <div className="inline-flex items-center gap-2 mb-2">
+                <motion.div
+                  animate={{
+                    boxShadow: [
+                      "0 0 20px rgba(59, 130, 246, 0.5)",
+                      "0 0 40px rgba(59, 130, 246, 0.8)",
+                      "0 0 20px rgba(59, 130, 246, 0.5)",
+                    ],
+                  }}
+                  transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY }}
+                >
+                  <Bot className="w-8 h-8 text-blue-600 dark:text-blue-400" />
+                </motion.div>
+                <h1 className="text-3xl font-bold text-gray-900 dark:text-white">AI Career Advisor</h1>
+              </div>
+              <p className="text-gray-600 dark:text-gray-300">
+                Get personalized career advice and guidance from our AI assistant
+              </p>
+            </motion.div>
+
+            {/* Chat Container */}
+            <Card className="flex-1 flex flex-col overflow-hidden">
+              <CardHeader className="bg-gradient-to-r from-blue-600 to-purple-600 text-white">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="flex items-center gap-2">
+                    <Sparkles className="w-5 h-5" />
+                    Career Chat Assistant
+                  </CardTitle>
+                  <div className="flex items-center gap-2">
+                    {messages.length > 1 && (
+                      <>
+                        <Button
+                          variant="secondary"
+                          size="sm"
+                          onClick={handleSaveConversation}
+                          disabled={isSaving}
+                          className="bg-white/20 hover:bg-white/30 text-white border-white/30"
+                        >
+                          {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                        </Button>
+                        <Button
+                          variant="secondary"
+                          size="sm"
+                          onClick={exportConversation}
+                          className="bg-white/20 hover:bg-white/30 text-white border-white/30"
+                        >
+                          <Download className="w-4 h-4" />
+                        </Button>
+                      </>
+                    )}
+                  </div>
+                </div>
+              </CardHeader>
+
+              {/* Messages Area */}
+              <CardContent className="flex-1 p-0 flex flex-col">
+                <ScrollArea className="flex-1 p-4">
+                  <div className="space-y-4">
+                    <AnimatePresence>
+                      {messages.map((message) => (
+                        <motion.div
+                          key={message.id}
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -20 }}
+                          className={`flex gap-3 ${message.role === "user" ? "justify-end" : "justify-start"}`}
+                        >
+                          {message.role === "assistant" && (
+                            <Avatar className="w-8 h-8 bg-blue-600">
+                              <AvatarFallback>
+                                <Bot className="w-4 h-4 text-white" />
+                              </AvatarFallback>
+                            </Avatar>
+                          )}
+
+                          <div
+                            className={`max-w-[80%] rounded-lg p-3 ${
+                              message.role === "user"
+                                ? "bg-blue-600 text-white"
+                                : "bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white"
+                            }`}
+                          >
+                            <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.content}</p>
+                          </div>
+
+                          {message.role === "user" && (
+                            <Avatar className="w-8 h-8 bg-purple-600">
+                              <AvatarFallback>
+                                <User className="w-4 h-4 text-white" />
+                              </AvatarFallback>
+                            </Avatar>
+                          )}
+                        </motion.div>
+                      ))}
+                    </AnimatePresence>
+
+                    {isLoading && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="flex gap-3 justify-start"
+                      >
+                        <Avatar className="w-8 h-8 bg-blue-600">
+                          <AvatarFallback>
+                            <Bot className="w-4 h-4 text-white" />
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-3">
+                          <div className="flex items-center gap-2">
+                            <Loader2 className="w-4 h-4 animate-spin text-blue-600" />
+                            <span className="text-sm text-gray-600 dark:text-gray-400">AI is thinking...</span>
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
+                  </div>
+                </ScrollArea>
+
+                {/* Input Area - Moved above welcome cards */}
+                <div className="p-4 border-t border-gray-200 dark:border-gray-700">
+                  <form onSubmit={handleSubmit} className="flex gap-2">
+                    <Input
+                      value={input}
+                      onChange={handleInputChange}
+                      placeholder="Ask me anything about careers..."
+                      disabled={isLoading}
+                      className="flex-1"
+                    />
+                    <Button
+                      type="submit"
+                      disabled={isLoading || !input.trim()}
+                      className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                    >
+                      {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+                    </Button>
+                  </form>
+                </div>
+
+                {/* Welcome Section for New Users - Now below input */}
+                {messages.length <= 1 && (
+                  <div className="border-t border-gray-200 dark:border-gray-700">
+                    <ChatWelcome />
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
