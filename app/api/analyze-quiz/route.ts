@@ -1,4 +1,4 @@
-import { openai } from "@ai-sdk/openai"
+import { google } from "@ai-sdk/google"
 import { generateObject } from "ai"
 import { z } from "zod"
 
@@ -35,7 +35,7 @@ export async function POST(req: Request) {
       .join("\n")
 
     const result = await generateObject({
-      model: openai("gpt-3.5-turbo"),
+      model: google("models/gemini-1.5-flash-latest"),
       system: `You are a professional career counselor and psychologist specializing in career assessment. 
       Analyze the quiz responses and provide personalized career recommendations.
       

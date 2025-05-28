@@ -1,4 +1,4 @@
-import { openai } from "@ai-sdk/openai"
+import { google } from "@ai-sdk/google"
 import { streamText } from "ai"
 
 export const maxDuration = 30
@@ -8,7 +8,7 @@ export async function POST(req: Request) {
     const { messages } = await req.json()
 
     const result = await streamText({
-      model: openai("gpt-3.5-turbo"),
+      model: google("models/gemini-1.5-flash-latest"),
       system: `You are a professional career advisor and guidance counselor with expertise in:
       - Career development and planning
       - Job search strategies and techniques
