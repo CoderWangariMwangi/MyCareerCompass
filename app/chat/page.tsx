@@ -24,8 +24,10 @@ interface Conversation {
 }
 
 export default function ChatPage() {
-  const { sessionId, createNewSession } = useSession()
-  const { saveConversation, isSaving } = useChatHistory(sessionId)
+  const { sessionId, createNewSession, isLoadingSession } = useSession()
+  // Initialize useChatHistory only when sessionId is available and not null
+  // Note: useChatHistory expects sessionId: string. If isLoadingSession is false, sessionId will be a string.
+  const { saveConversation, isSaving } = useChatHistory(sessionId || ""); // Pass empty string if sessionID is null during initial brief moment before isLoadingSession guard
   const [sidebarOpen, setSidebarOpen] = useState(true) // Default to open on desktop
   const [currentConversationId, setCurrentConversationId] = useState<string | null>(null)
   const [isMobile, setIsMobile] = useState(false)
@@ -96,6 +98,21 @@ export default function ChatPage() {
     createNewSession()
   }
 
+  if (isLoadingSession) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+        <p className="ml-2">Loading chat session...</p>
+      </div>
+    );
+  }
+
+  // At this point, isLoadingSession is false, and sessionId should be a string.
+  // We can use sessionId! if we are certain, or handle the null case if useChatHistory is called before the guard.
+  // The useChatHistory call above was modified to pass `sessionId || ""` to satisfy its type, 
+  // but it's better to ensure it's only effectively used when sessionId is truly ready.
+  // For components like ChatHistorySidebar, we'll pass sessionId! as it's guarded by isLoadingSession.
+
   const exportConversation = () => {
     const conversationText = messages.map((msg) => `${msg.role === "user" ? "You" : "AI"}: ${msg.content}`).join("\n\n")
 
@@ -120,7 +137,10 @@ export default function ChatPage() {
         onToggle={() => setSidebarOpen(!sidebarOpen)}
         onLoadConversation={handleLoadConversation}
         onNewChat={handleNewChat}
-        sessionId={sessionId}
+        currentConversationId={currentConversationId}
+        sessionId={sessionId!} // Safe because isLoadingSession is false here
+        isMobile={isMobile}
+        onClose={() => setSidebarOpen(false)}
       />
 
       <div className={`pt-20 pb-4 transition-all duration-300 ${sidebarOpen && !isMobile ? "md:ml-80" : ""}`}>
