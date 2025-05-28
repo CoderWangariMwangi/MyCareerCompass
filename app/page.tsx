@@ -9,11 +9,11 @@ import { Navigation } from "@/components/navigation"
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-purple-900">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-purple-900 pt-16">
       <Navigation />
 
       {/* Hero Section */}
-      <section className="relative overflow-hidden pt-20 pb-16">
+      <section className="relative overflow-hidden pt-12 pb-10 md:pt-16 md:pb-12 lg:pt-20 lg:pb-16">
         <div className="container mx-auto px-4">
           <div className="flex flex-col lg:flex-row items-center gap-12">
             <motion.div
@@ -41,13 +41,13 @@ export default function HomePage() {
                 >
                   <Compass className="w-12 h-12 text-blue-600 dark:text-blue-400" />
                 </motion.div>
-                <h1 className="text-4xl lg:text-6xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent break-words">
+                <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent break-words">
                   MyCareer<span className="text-blue-600 dark:text-blue-400">Compass</span>
                 </h1>
               </motion.div>
 
               <motion.p
-                className="text-xl text-gray-600 dark:text-gray-300 mb-8 max-w-2xl break-words"
+                className="text-lg sm:text-xl text-gray-600 dark:text-gray-300 mb-8 max-w-2xl break-words"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.4 }}
@@ -119,7 +119,7 @@ export default function HomePage() {
       </section>
 
       {/* Features Section */}
-      <section className="py-16 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm">
+      <section className="py-12 md:py-16 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm">
         <div className="container mx-auto px-4">
           <motion.div
             className="text-center mb-12"
@@ -175,7 +175,7 @@ export default function HomePage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16">
+      <section className="py-12 md:py-16">
         <div className="container mx-auto px-4 text-center">
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}

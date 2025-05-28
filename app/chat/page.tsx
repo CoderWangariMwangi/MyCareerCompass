@@ -145,8 +145,8 @@ export default function ChatPage() {
         <div className="container mx-auto px-2 sm:px-4 h-[calc(100vh-6rem)]">
           <div className="max-w-4xl mx-auto h-full flex flex-col">
             {/* Header */}
-            <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-6">
-              <div className="inline-flex items-center gap-2 mb-2">
+            <div className="w-full text-center mb-6 px-1">
+              <div className="w-full flex flex-col items-center gap-1 sm:flex-row sm:justify-center sm:items-center sm:gap-2 mb-2">
                 <motion.div
                   animate={{
                     boxShadow: [
@@ -157,24 +157,23 @@ export default function ChatPage() {
                   }}
                   transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY }}
                 >
-                  <Bot className="w-8 h-8 text-blue-600 dark:text-blue-400" />
+                  <Bot className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 lg:w-8 lg:h-8 text-blue-600 dark:text-blue-400" />
                 </motion.div>
-                <h1 className="text-3xl font-bold text-gray-900 dark:text-white">AI Career Advisor</h1>
+                <h1 className="min-w-0 max-w-full sm:max-w-none text-sm leading-tight tracking-tight sm:leading-normal sm:tracking-normal sm:text-lg md:text-xl lg:text-3xl font-bold text-gray-900 dark:text-white break-all text-center overflow-hidden">AI Career Advisor</h1>
               </div>
-              <p className="text-gray-600 dark:text-gray-300">
+              <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300">
                 Get personalized career advice and guidance from our AI assistant
               </p>
-            </motion.div>
-
-            {/* Chat Container */}
+            </div>
+              {/* Chat Container */}
             <Card className="flex-1 flex flex-col overflow-hidden">
               <CardHeader className="bg-gradient-to-r from-blue-600 to-purple-600 text-white">
                 <div className="flex items-center justify-between">
-                  <CardTitle className="flex items-center gap-2">
+                  <CardTitle className="flex items-center gap-2 text-lg md:text-xl">
                     <Sparkles className="w-5 h-5" />
                     Career Chat Assistant
                   </CardTitle>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1 sm:gap-2">
                     {messages.length > 1 && (
                       <>
                         <Button
