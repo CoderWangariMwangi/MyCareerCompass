@@ -5,6 +5,10 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Sparkles, Target, TrendingUp, Users, BookOpen } from "lucide-react"
 
+interface ChatWelcomeProps {
+  onSuggestedQuestion: (question: string) => void;
+}
+
 const features = [
   {
     icon: Target,
@@ -32,7 +36,7 @@ const features = [
   },
 ]
 
-export function ChatWelcome() {
+export function ChatWelcome({ onSuggestedQuestion }: ChatWelcomeProps) {
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-6 p-6">
       <div className="text-center">
@@ -54,23 +58,16 @@ export function ChatWelcome() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.1 }}
             onClick={() => {
-              // Auto-fill the chat input with a related question
-              const chatInput = document.querySelector('input[placeholder*="Ask me anything"]') as HTMLInputElement
-              if (chatInput) {
-                const questions = {
-                  "Career Planning": "Can you help me create a career development plan?",
-                  "Skill Development": "What skills should I focus on developing for my career?",
-                  "Interview Prep": "How can I prepare for upcoming job interviews?",
-                  "Industry Insights": "What are the current trends in my industry?",
-                }
-                chatInput.value =
-                  questions[feature.title as keyof typeof questions] ||
-                  `Tell me more about ${feature.title.toLowerCase()}`
-                chatInput.focus()
-                // Trigger input change event
-                const event = new Event("input", { bubbles: true })
-                chatInput.dispatchEvent(event)
-              }
+              const questions = {
+                "Career Planning": "Can you help me create a career development plan?",
+                "Skill Development": "What skills should I focus on developing for my career?",
+                "Interview Prep": "How can I prepare for upcoming job interviews?",
+                "Industry Insights": "What are the current trends in my industry?",
+              };
+              const questionText = 
+                questions[feature.title as keyof typeof questions] ||
+                `Tell me more about ${feature.title.toLowerCase()}`;
+              onSuggestedQuestion(questionText);
             }}
             className="w-full text-left"
           >

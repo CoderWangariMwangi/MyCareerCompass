@@ -4,7 +4,6 @@ import { motion, AnimatePresence } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { ScrollArea } from "@/components/ui/scroll-area"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Send, Bot, User, Sparkles, Loader2, Save, Download } from "lucide-react"
 import { Navigation } from "@/components/navigation"
@@ -140,11 +139,10 @@ export default function ChatPage() {
         currentConversationId={currentConversationId}
         sessionId={sessionId!} // Safe because isLoadingSession is false here
         isMobile={isMobile}
-        onClose={() => setSidebarOpen(false)}
       />
 
       <div className={`pt-20 pb-4 transition-all duration-300 ${sidebarOpen && !isMobile ? "md:ml-80" : ""}`}>
-        <div className="container mx-auto px-4 h-[calc(100vh-6rem)]">
+        <div className="container mx-auto px-2 sm:px-4 h-[calc(100vh-6rem)]">
           <div className="max-w-4xl mx-auto h-full flex flex-col">
             {/* Header */}
             <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-6">
@@ -203,8 +201,10 @@ export default function ChatPage() {
               </CardHeader>
 
               {/* Messages Area */}
-              <CardContent className="flex-1 p-0 flex flex-col">
-                <ScrollArea className="flex-1 p-4">
+              <CardContent className="flex-1 p-4 overflow-y-auto">
+                {messages.length === 0 || (messages.length === 1 && messages[0].id === "welcome" && messages[0].role === "assistant") ? (
+                  <ChatWelcome onSuggestedQuestion={handleSuggestedQuestion} />
+                ) : (
                   <div className="space-y-4">
                     <AnimatePresence>
                       {messages.map((message) => (
@@ -222,7 +222,6 @@ export default function ChatPage() {
                               </AvatarFallback>
                             </Avatar>
                           )}
-
                           <div
                             className={`max-w-[80%] rounded-lg p-3 ${
                               message.role === "user"
@@ -232,7 +231,6 @@ export default function ChatPage() {
                           >
                             <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.content}</p>
                           </div>
-
                           {message.role === "user" && (
                             <Avatar className="w-8 h-8 bg-purple-600">
                               <AvatarFallback>
@@ -243,7 +241,6 @@ export default function ChatPage() {
                         </motion.div>
                       ))}
                     </AnimatePresence>
-
                     {isLoading && (
                       <motion.div
                         initial={{ opacity: 0, y: 20 }}
@@ -264,37 +261,28 @@ export default function ChatPage() {
                       </motion.div>
                     )}
                   </div>
-                </ScrollArea>
-
-                {/* Input Area - Moved above welcome cards */}
-                <div className="p-4 border-t border-gray-200 dark:border-gray-700">
-                  <form onSubmit={handleSubmit} className="flex gap-2">
-                    <Input
-                      value={input}
-                      onChange={handleInputChange}
-                      placeholder="Ask me anything about careers..."
-                      disabled={isLoading}
-                      className="flex-1"
-                    />
-                    <Button
-                      type="submit"
-                      disabled={isLoading || !input.trim()}
-                      className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
-                    >
-                      {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
-                    </Button>
-                  </form>
-                </div>
-
-                {/* Welcome Section for New Users - Now below input */}
-                {messages.length <= 1 && (
-                  <div className="border-t border-gray-200 dark:border-gray-700">
-                    <ScrollArea className="p-4 max-h-56">
-                      <ChatWelcome />
-                    </ScrollArea>
-                  </div>
                 )}
               </CardContent>
+
+              {/* Input Area */}
+              <div className="p-4 border-t border-gray-200 dark:border-gray-700">
+                <form onSubmit={handleSubmit} className="flex gap-2">
+                  <Input
+                    value={input}
+                    onChange={handleInputChange}
+                    placeholder="Ask me anything about careers..."
+                    disabled={isLoading}
+                    className="flex-1"
+                  />
+                  <Button
+                    type="submit"
+                    disabled={isLoading || !input.trim()}
+                    className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                  >
+                    {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+                  </Button>
+                </form>
+              </div>
             </Card>
           </div>
         </div>

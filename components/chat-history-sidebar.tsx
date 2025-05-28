@@ -24,6 +24,8 @@ interface ChatHistorySidebarProps {
   onLoadConversation: (conversation: Conversation) => void
   onNewChat: () => void
   sessionId: string
+  currentConversationId: string | null
+  isMobile: boolean
 }
 
 export function ChatHistorySidebar({
@@ -32,6 +34,8 @@ export function ChatHistorySidebar({
   onLoadConversation,
   onNewChat,
   sessionId,
+  currentConversationId,
+  isMobile,
 }: ChatHistorySidebarProps) {
   const [conversations, setConversations] = useState<Conversation[]>([])
   const [searchTerm, setSearchTerm] = useState("")
