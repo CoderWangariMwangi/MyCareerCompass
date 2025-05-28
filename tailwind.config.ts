@@ -9,7 +9,18 @@ const config: Config = {
     "*.{js,ts,jsx,tsx,mdx}"
   ],
   theme: {
-  	extend: {
+    extend: {
+      screens: {
+        // You can define your mobile breakpoints here
+        // Example:
+        'xs': '320px', // for very small mobile screens
+        'sm': '400px', // for standard mobile screens
+        // Add or override other breakpoints as needed:
+        'md': '768px',
+        'lg': '1024px',
+        'xl': '1280px',
+        '2xl': '1536px',
+      },
   		colors: {
   			background: 'hsl(var(--background))',
   			foreground: 'hsl(var(--foreground))',
