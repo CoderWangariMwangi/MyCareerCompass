@@ -41,13 +41,13 @@ export default function HomePage() {
                 >
                   <Compass className="w-12 h-12 text-blue-600 dark:text-blue-400" />
                 </motion.div>
-                <h1 className="text-4xl lg:text-6xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                <h1 className="text-4xl lg:text-6xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent break-words">
                   MyCareer<span className="text-blue-600 dark:text-blue-400">Compass</span>
                 </h1>
               </motion.div>
 
               <motion.p
-                className="text-xl text-gray-600 dark:text-gray-300 mb-8 max-w-2xl"
+                className="text-xl text-gray-600 dark:text-gray-300 mb-8 max-w-2xl break-words"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.4 }}

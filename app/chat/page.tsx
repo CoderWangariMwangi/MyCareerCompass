@@ -289,7 +289,9 @@ export default function ChatPage() {
                 {/* Welcome Section for New Users - Now below input */}
                 {messages.length <= 1 && (
                   <div className="border-t border-gray-200 dark:border-gray-700">
-                    <ChatWelcome />
+                    <ScrollArea className="p-4 max-h-56">
+                      <ChatWelcome />
+                    </ScrollArea>
                   </div>
                 )}
               </CardContent>
